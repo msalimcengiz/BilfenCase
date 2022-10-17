@@ -297,7 +297,7 @@ CREATE TABLE `personal_access_tokens` (
 
 LOCK TABLES `personal_access_tokens` WRITE;
 /*!40000 ALTER TABLE `personal_access_tokens` DISABLE KEYS */;
-INSERT INTO `personal_access_tokens` VALUES (1,'App\\Models\\User',1,'API TOKEN','13277ff827a946face8f4f90dcb05364604238e4bd891fbc6a04293dd5a55042','[\"*\"]','2022-10-16 21:30:13',NULL,'2022-10-16 13:22:59','2022-10-16 21:30:13'),(2,'App\\Models\\Student',7,'API TOKEN','84af989d9b1ca9b60ab9a1d473d41a3cf6a0fe0b7d20b18aadf854990813d3e7','[\"*\"]',NULL,NULL,'2022-10-16 15:50:38','2022-10-16 15:50:38'),(3,'App\\Models\\Student',1,'API TOKEN','8877d2afa5abef3e44d56b37eabbe1c6ce01572f12609dc1f44fb1818c3350ad','[\"*\"]',NULL,NULL,'2022-10-16 16:41:40','2022-10-16 16:41:40'),(4,'App\\Models\\Student',1,'API TOKEN','929a40f75b2764af7f57e2ca0daa8d84a5fc2fe1252cb94843c41f1fb5a28a3c','[\"*\"]',NULL,NULL,'2022-10-16 16:41:51','2022-10-16 16:41:51'),(5,'App\\Models\\Student',1,'API TOKEN','97a2bc66a6745b36f976dcf5b83996ff1b26611dcf834067387fcf0c12fdd043','[\"*\"]',NULL,NULL,'2022-10-16 16:43:34','2022-10-16 16:43:34');
+INSERT INTO `personal_access_tokens` VALUES (1,'App\\Models\\User',1,'API TOKEN','13277ff827a946face8f4f90dcb05364604238e4bd891fbc6a04293dd5a55042','[\"*\"]','2022-10-16 22:03:02',NULL,'2022-10-16 13:22:59','2022-10-16 22:03:02'),(2,'App\\Models\\Student',7,'API TOKEN','84af989d9b1ca9b60ab9a1d473d41a3cf6a0fe0b7d20b18aadf854990813d3e7','[\"*\"]',NULL,NULL,'2022-10-16 15:50:38','2022-10-16 15:50:38'),(3,'App\\Models\\Student',1,'API TOKEN','8877d2afa5abef3e44d56b37eabbe1c6ce01572f12609dc1f44fb1818c3350ad','[\"*\"]',NULL,NULL,'2022-10-16 16:41:40','2022-10-16 16:41:40'),(4,'App\\Models\\Student',1,'API TOKEN','929a40f75b2764af7f57e2ca0daa8d84a5fc2fe1252cb94843c41f1fb5a28a3c','[\"*\"]',NULL,NULL,'2022-10-16 16:41:51','2022-10-16 16:41:51'),(5,'App\\Models\\Student',1,'API TOKEN','97a2bc66a6745b36f976dcf5b83996ff1b26611dcf834067387fcf0c12fdd043','[\"*\"]',NULL,NULL,'2022-10-16 16:43:34','2022-10-16 16:43:34');
 /*!40000 ALTER TABLE `personal_access_tokens` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -387,6 +387,52 @@ LOCK TABLES `users` WRITE;
 INSERT INTO `users` VALUES (1,'msc','msalimcengiz@gmail.com',NULL,'$2y$10$48pVnrjs7tBmW2grpFo5Ge4RBrV9OHeB8NipY0f1OULRkgCyk05Ri',NULL,'2022-10-16 13:22:59','2022-10-16 13:22:59');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Dumping routines for database 'bilfenCase'
+--
+/*!50003 DROP PROCEDURE IF EXISTS `students_get` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`admin`@`%` PROCEDURE `students_get`(pageNumber INT,dataCount INT)
+BEGIN
+	SET @startData := (pageNumber*dataCount) - dataCount;
+    SET @dataLimit := dataCount;
+    PREPARE stmt FROM "select id,tcno,name,surname,school_id,(select name from schools where id=school_id) as school_name,school_no,created_at,updated_at from students limit ?,?;";
+    EXECUTE stmt USING @startData, @dataLimit;
+	DEALLOCATE PREPARE stmt;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `students_totalPage` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`admin`@`%` PROCEDURE `students_totalPage`(dataCount INT)
+BEGIN
+	select CEILING(( count(id) / dataCount)) as totalPageNumber from students;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -397,4 +443,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-10-17  0:34:00
+-- Dump completed on 2022-10-17 12:08:15
